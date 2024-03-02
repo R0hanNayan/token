@@ -1,6 +1,8 @@
 import Principal "mo:base/Principal";
 import HashMap "mo:base/HashMap";
 import Debug "mo:base/Debug";
+import Text "mo:base/Text";
+import Nat "mo:base/Nat";
 
 
 actor Token {
@@ -38,6 +40,24 @@ actor Token {
             return "Success";
         }else{
             return "Already Claimed";
+        }
+    };
+
+    //to transfer coins from one account to other
+    public shared(msg) func transfer(to: Principal, amount: Nat) : async Text {
+        let fromBalance = await balanceOf(msg.caller);
+        if(fromBalance >= amount) {
+            let newFromBalance: Nat = fromBalance - amount;
+            balances.put(msg.caller, newFromBalance);   //Update balance from senders account
+            
+            // adding amount to reciever's account
+            let toBalance = await balanceOf(to);
+            let newToBalance = toBalance + amount;
+            balances.put(to, newToBalance);
+
+            return "Success";
+        }else{
+            return "Insufficient Balance!";
         }
     };
 }

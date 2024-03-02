@@ -5,7 +5,7 @@ import HashMap "mo:base/HashMap";
 actor Token {
     var owner: Principal = Principal.fromText("e7pzm-gz4t2-b6wca-fm2ys-j6dbq-fjtqo-gzcbd-oujfm-t3sjo-uchi2-fqe");
     var totalSupply: Nat = 1000000000;
-    var symbol: Text = "AANG";
+    var symbol: Text = "NOV";
 
     //Creating a Ledger
     var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
@@ -21,5 +21,10 @@ actor Token {
         };
 
         return balance;
-    }
+    };
+    
+    //to get the symbol of the token
+    public query func getSymbol() : async Text{
+        return symbol;
+    };
 }

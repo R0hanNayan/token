@@ -3,6 +3,7 @@ import HashMap "mo:base/HashMap";
 import Debug "mo:base/Debug";
 import Text "mo:base/Text";
 import Nat "mo:base/Nat";
+import Iter "mo:base/Iter";
 
 
 actor Token {
@@ -10,10 +11,13 @@ actor Token {
     var totalSupply: Nat = 1000000000;
     var symbol: Text = "NOV";
 
+    private stable var balanceEntries: [(Principal, Nat)] = [];
     //Creating a Ledger
-    var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
-    //Adding the owner to ledger and providing total Supply of token to owner
-    balances.put(owner, totalSupply);   
+    private var balances = HashMap.HashMap<Principal, Nat>(1, Principal.equal, Principal.hash);
+    if(balances.size() < 1){
+        //Adding the owner to ledger and providing total Supply of token to owner
+        balances.put(owner, totalSupply); 
+    };
 
     //to retrive account balance using principle id
     public query func balanceOf(who: Principal) : async Nat {
@@ -59,5 +63,17 @@ actor Token {
         }else{
             return "Insufficient Balance!";
         }
+    };
+
+    system func preupgrade() {
+        balanceEntries := Iter.toArray(balances.entries());
+    };
+
+    system func postupgrade() {
+        balances := HashMap.fromIter<Principal, Nat>(balanceEntries.vals(), 1, Principal.equal, Principal.hash);
+        if(balances.size() < 1){
+            //Adding the owner to ledger and providing total Supply of token to owner
+            balances.put(owner, totalSupply); 
+        };
     };
 }
